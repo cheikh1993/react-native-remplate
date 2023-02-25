@@ -45,9 +45,8 @@ const Home = ({ navigation }) => {
   const [showMenubar, setShowMenubar] = React.useState(true)
   const scrollx = useRef(new Animated.Value(0)).current;
   const { userInfo, padding, error, errorMessage } = useSelector(state => state.user)
-  // console.log("User: " ,userInfo, "Padding ",padding, "Error", error);
-
-  console.log(errorMessage);
+const userId = useSelector(state => state.auth.user)
+console.log("Cheikh : ",userId);
   let postcat = post.filter(a => a.categorie === showcat);
   const dataCategorie = Object.keys(cat).map(i => ({
     id: i,

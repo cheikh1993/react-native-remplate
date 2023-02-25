@@ -1,8 +1,13 @@
 import React from 'react'
 import { View,Text, Image } from 'react-native'
+import { useSelector } from 'react-redux'
 import { icons } from '../../constants'
 
 const Favorie = () => {
+    const user = useSelector(state => state.auth.user)
+
+    const {password, ...others} = user[0]
+    console.log(others);
   return (
     <View style={{
         flex: 1,
@@ -22,6 +27,7 @@ const Favorie = () => {
         />
         <Text>Vos favories sont actuellement vide vous pouvez ajouter en clique sur le button add
             </Text>
+            <Text></Text>
         </View>
   )
 }

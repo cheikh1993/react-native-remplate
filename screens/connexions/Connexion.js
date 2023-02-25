@@ -18,6 +18,8 @@ import {CheckBox, IconButton, InputForm, Loading, TextButtom} from '../../compon
 import {icons} from '../../constants';
 import {AuthContext} from '../../context/AuthContext';
 import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../../redux/redux-toolkit/ApiCall';
 const {height, width} = Dimensions.get('screen');
 
 const Connexion = ({navigation}) => {
@@ -54,11 +56,23 @@ const Connexion = ({navigation}) => {
       height: height * 0.7,
     },
   });
-  console.log(err);
 
-  useEffect(() => {
-    animationStates.transitionTo('signIn');
-    // fetchUser()
+const dispatchs = useDispatch()
+const nitt = useSelector(state => state.auth.user)
+const nit= {
+email: "fayedev93@gmail.com",
+password: "123"
+}
+
+if(nitt){
+  navigation.navigate("Home")
+}
+useEffect(() => {
+  animationStates.transitionTo('signIn');
+  login(nit, dispatchs)
+  // fetchUser()
+  
+
   }, []);
   
   const handSubmit = async () => {

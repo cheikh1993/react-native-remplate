@@ -1,8 +1,14 @@
 import axios from "axios";
 import { addUserStart, adduserSucces, addUserFaillure, addUserFaillureMessage } from "./userSlice";
-
+import {
+    loginStart,
+    loginSuccess,
+    loginFaillure
+} from "./Authenfication/loginSlice"
 const API_URL = 'https://node-sql-faye-api.vercel.app';
 
+
+// Get USERS
 export const getUsers = async (dispatch) => {
     dispatch(addUserStart())
     try {
@@ -12,4 +18,18 @@ export const getUsers = async (dispatch) => {
     } catch (error) {
         dispatch(addUserFaillure(error.response.data))
     }
+}
+
+//=============AUTHENTIFICATION=============//
+
+//----------LOGIN----------------//
+export const login = async (user, dispatch) => {
+    dispatch(loginStart())
+    try {
+        const res = await axios.post(`${API_URL}/api/user/login`, user)
+        dispatch(loginSuccess(res.data))
+    } catch (error) {
+        dispatch(loginFaillure())
+    }
+
 }
