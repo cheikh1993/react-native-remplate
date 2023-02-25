@@ -1,7 +1,9 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
+import { useSelector } from 'react-redux';
 
 const Header = ({titleStyle,title,leftComponent, rightComponent}) => {
+
   return (
     <View
       style={{
@@ -17,6 +19,8 @@ const Header = ({titleStyle,title,leftComponent, rightComponent}) => {
       <Text style={{
         ...titleStyle
       }}>{title}</Text>
+
+
       {rightComponent}
     </View>
   );

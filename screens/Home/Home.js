@@ -23,6 +23,8 @@ import { Shadow } from 'react-native-shadow-2';
 import axios from 'axios';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Favorie, Notification, Search } from '../jndex';
+import { useDispatch, useSelector } from 'react-redux';
+import { getUsers } from '../../redux/redux-toolkit/ApiCall';
 const { height, width } = Dimensions.get('screen');
 const ITEM_SIZE = width * 0.3;
 
@@ -42,7 +44,10 @@ const Home = ({ navigation }) => {
   const [categorie, setCategorie] = React.useState('');
   const [showMenubar, setShowMenubar] = React.useState(true)
   const scrollx = useRef(new Animated.Value(0)).current;
+  const { userInfo, padding, error, errorMessage } = useSelector(state => state.user)
+  // console.log("User: " ,userInfo, "Padding ",padding, "Error", error);
 
+  console.log(errorMessage);
   let postcat = post.filter(a => a.categorie === showcat);
   const dataCategorie = Object.keys(cat).map(i => ({
     id: i,
@@ -56,9 +61,13 @@ const Home = ({ navigation }) => {
       console.log(error);
     }
   };
-  useEffect(() => {
-    getCategorie();
-    getPost()
+const dispatch = useDispatch()
+
+
+useEffect(() => {
+  getCategorie();
+  getPost()
+  getUsers(dispatch)
   }, []);
   const getPost = async () => {
     try {
@@ -783,7 +792,7 @@ const Home = ({ navigation }) => {
       showMenubar && <UpdateModif />
      }
       <Header
-        title={'Bienvenu'}
+        title={'Bienvenue'}
         titleStyle={{
           fontSize: 30,
           color: '#000',
