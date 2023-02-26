@@ -60,7 +60,7 @@ const Connexion = ({navigation}) => {
 const dispatchs = useDispatch()
 const nitt = useSelector(state => state.auth.user)
 const nit= {
-email: "fayedev93@gmail.com",
+  email: "fayedevw93@gmail.com",
 password: "123"
 }
 

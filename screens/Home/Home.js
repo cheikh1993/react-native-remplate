@@ -46,7 +46,6 @@ const Home = ({ navigation }) => {
   const scrollx = useRef(new Animated.Value(0)).current;
   const { userInfo, padding, error, errorMessage } = useSelector(state => state.user)
 const userId = useSelector(state => state.auth.user)
-console.log("Cheikh : ",userId);
   let postcat = post.filter(a => a.categorie === showcat);
   const dataCategorie = Object.keys(cat).map(i => ({
     id: i,
@@ -783,6 +782,10 @@ useEffect(() => {
         return <Favorie />;
     }
   }
+
+  const userss = useSelector(state => state.auth.user)
+  const l = userss.others?.name[0] + userss.others?.username[0]
+
   return (
     <View style={styles.container}>
       {showModal && renderModal()}
@@ -838,7 +841,7 @@ useEffect(() => {
                 letterSpacing: 1,
                 fontFamily: 'serif',
               }}>
-              CF
+              { l &&  l.toLocaleUpperCase()}
             </Text>
           </TouchableOpacity>
         }

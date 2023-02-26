@@ -5,6 +5,8 @@ import {
     loginSuccess,
     loginFaillure
 } from "./Authenfication/loginSlice"
+
+import { starLoading, getFavorie, faillure } from "./favoriePostSlice";
 const API_URL = 'https://node-sql-faye-api.vercel.app';
 
 
@@ -32,4 +34,19 @@ export const login = async (user, dispatch) => {
         dispatch(loginFaillure())
     }
 
+}
+
+//=======================Favorie Post===================//
+
+//-----------------Get All favorie post---------------//
+
+export const getFavoriePost = async (userId, dispatch) => {
+    dispatch(starLoading)
+    try {
+        const res = await axios.get(`${API_URL}/api/favorie?userId=` + userId)
+
+        dispatch(getFavorie(res.data))
+    } catch (error) {
+        dispatch(faillure(error.response.data))
+    }
 }
