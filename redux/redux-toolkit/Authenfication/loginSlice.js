@@ -5,24 +5,26 @@ const authSlice = createSlice({
     name: "login",
     initialState:{
         user:{},
-        padding: false,
-        error: false
+        loading: null,
+        error: false,
+    message: null,
     },
     reducers:{
-        loginStart: (state) => {
-                state.padding= true
-        },
+        loginStart: (state) => { state.loading = true},
         loginSuccess: (state, action) => {
-            state.padding= false,
+            state.loading= false,
             state.user = action.payload
 
         },
         loginFaillure:(state) => {
             state.error = true,
-            state.padding= false
+            state.loading= false
+        },
+        message:(state,actoin) => {
+            state.message = actoin.payload
         }
     }
 })
 
-export const {loginStart,loginSuccess,loginFaillure} = authSlice.actions;
+export const {loginStart,loginSuccess,loginFaillure, message} = authSlice.actions;
 export  default authSlice.reducer;

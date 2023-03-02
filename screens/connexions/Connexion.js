@@ -20,6 +20,7 @@ import {AuthContext} from '../../context/AuthContext';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../../redux/redux-toolkit/ApiCall';
+import RenderSingIn from './RenderSingIn';
 const {height, width} = Dimensions.get('screen');
 
 const Connexion = ({navigation}) => {
@@ -57,228 +58,17 @@ const Connexion = ({navigation}) => {
     },
   });
 
-const dispatchs = useDispatch()
-const nitt = useSelector(state => state.auth.user)
-const nit= {
-  email: "fayedevw93@gmail.com",
-password: "123"
-}
 
-if(nitt){
-  navigation.navigate("Home")
-}
+
+
 useEffect(() => {
   animationStates.transitionTo('signIn');
-  login(nit, dispatchs)
   // fetchUser()
   
 
   }, []);
+ 
   
-  const handSubmit = async () => {
-    setLoading(true);
-    //  dispatch({type: 'LOGIN_START'});
-    //  try {
-    //  const response =  await axios.post(`${API_URL}/api/user/login`, {
-    //      password,
-    //      email,
-    //    });
-    //    dispatch({type: 'LOGIN_SUCCESS', payload: response.data});
-    //    navigation.replace("Home")
-    //  } catch (err) {
-    //   setErrorConnect(true)
-    //    dispatch({type: 'LOGIN_FAILURE', payload: response.message.data});
-    //  }
-    try {
-      const res = await axios.post(`${API_URL}/api/user/login`, {
-        email,
-        password,
-      });
-      setUser(res.data);
-      navigation.replace('Home', userInfo);
-    } catch (err) {
-      setErrorConnect(true);
-      setLoading(false);
-      setErrorConnectmessage(err.response.data);
-      setTimeout(() => {
-        setErrorConnect(false);
-      }, 15000);
-    }
-    setEmail('');
-    setPassword('');
-  };
-  function renderSingIn() {
-    return (
-      <MotiView
-        state={animationStates}
-        style={[
-          {
-            marginTop: 10,
-            height: height * 0.55,
-          },
-        ]}>
-        <Shadow>
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: 'white',
-              borderRadius: 5,
-              width: width * 0.92,
-              padding: 10,
-            }}>
-            <Text
-              style={{
-                color: '#000',
-                fontSize: 20,
-                letterSpacing: 1,
-                fontWeight: '600',
-                textTransform: 'capitalize',
-                marginTop: 8,
-                width: '60%',
-              }}>
-              Connectez-vous pour continuer !
-            </Text>
-
-            <KeyboardAwareScrollView
-              enableOnAndroid={true}
-              keyboardDismissMode="on-drag"
-              keyboardShouldPersistTaps="handled"
-              extraScrollHeight={-300}
-              contentContainerStyle={{
-                flexGrow: 1,
-                paddingHorizontal: 10,
-              }}>
-              <Text
-                style={{
-                  color: '#000',
-                  fontSize: 14,
-                }}>
-                E-mail
-              </Text>
-              <InputForm
-                onSubmitEditing={handSubmit}
-                value={email}
-                placeHolder={'Votre email'}
-                onChange={text => setEmail(text)}
-                containerStyle={{
-                  marginTop: 10,
-                }}
-                prependComponent={
-                  <Image
-                    source={icons.bus}
-                    style={{
-                      height: 22,
-                      width: 22,
-                      tintColor: 'tomato',
-                      marginRight: 10,
-                    }}
-                  />
-                }
-                appendComponent={
-                  <Image
-                    source={icons.compass}
-                    style={{
-                      width: 22,
-                      height: 22,
-                      tintColor: '#000',
-                    }}
-                  />
-                }
-              />
-              <View
-                style={{
-                  marginTop: 10,
-                }}>
-                <Text
-                  style={{
-                    color: '#000',
-                    fontSize: 14,
-                  }}>
-                  Mot de passe
-                </Text>
-                <InputForm
-                  containerStyle={{
-                    marginTop: 9,
-                  }}
-                  onSubmitEditing={handSubmit}
-                  value={password}
-                  onChange={text => setPassword(text)}
-                  placeHolder="Votre mot de pass"
-                  secureTextEntry={!visible}
-                  appendComponent={
-                    <TouchableOpacity
-                      onPress={() => setVisible(!visible)}
-                      style={{
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
-                      <Image
-                        source={visible ? icons.airplane : icons.barMenu}
-                        style={{
-                          width: 20,
-                          height: 20,
-                          tintColor: visible ? 'red' : '#000',
-                        }}
-                      />
-                    </TouchableOpacity>
-                  }
-                />
-              </View>
-              <View
-                style={{
-                  marginTop: 15,
-                  alignItems: 'flex-end',
-                }}>
-                <TextButtom
-                  label={'Mot de passe oublie ?'}
-                  labelStyle={{
-                    color: '#000',
-                  }}
-                />
-              </View>
-              {errConnect && (
-                <Text
-                  style={{
-                    color: 'red',
-                    fontWeight: '140',
-                    fontSize: 12,
-                    width: '70%',
-                  }}>
-                  {errConnectmessage}
-                </Text>
-              )}
-              {err && (
-                <Text
-                  style={{
-                    color: 'red',
-                    fontSize: 20,
-                    width: '70%',
-                  }}>
-                  {err.message}
-                </Text>
-              )}
-            </KeyboardAwareScrollView>
-            {/* { loading && <Text>loading.....</Text> } */}
-            <TextButtom
-              label={'Se connecter'}
-              containerStyle={{
-                height: 50,
-                backgroundColor: 'tomato',
-                marginBottom: 10,
-              }}
-              onPress={() => {
-                handSubmit();
-              }}
-              labelStyle={{
-                color: 'white',
-                fontSize: 18,
-              }}
-            />
-          </View>
-        </Shadow>
-      </MotiView>
-    );
-  }
 
   function renderSingUp() {
     const handSubmitSignUp = () => {
@@ -599,7 +389,7 @@ useEffect(() => {
 
   function renderAuth() {
     if (show) {
-      return renderSingIn();
+      return  <RenderSingIn navigation={navigation} />
     } else {
       return renderSingUp();
     }

@@ -8,9 +8,10 @@ import { getFavorie } from '../../redux/redux-toolkit/favoriePostSlice'
 const Favorie = () => {
     const user = useSelector(state => state.auth.user)
     const { loading, favorie, error } = useSelector(state => state.favorie)
+
     const dispatch = useDispatch()
-    const userId = user.others.id
-    console.log(favorie);
+    const userId = user.others?.id
+    console.log(favorie.length);
     useEffect(() => {
         getFavoriePost(userId, dispatch)
     }, [])

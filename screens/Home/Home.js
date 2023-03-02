@@ -24,7 +24,7 @@ import axios from 'axios';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Favorie, Notification, Search } from '../jndex';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUsers } from '../../redux/redux-toolkit/ApiCall';
+import { AddFavorie, getUsers } from '../../redux/redux-toolkit/ApiCall';
 const { height, width } = Dimensions.get('screen');
 const ITEM_SIZE = width * 0.3;
 
@@ -44,7 +44,7 @@ const Home = ({ navigation }) => {
   const [categorie, setCategorie] = React.useState('');
   const [showMenubar, setShowMenubar] = React.useState(true)
   const scrollx = useRef(new Animated.Value(0)).current;
-  const { userInfo, padding, error, errorMessage } = useSelector(state => state.user)
+  const { userInfo, padding, errorMessage } = useSelector(state => state.user)
 const userId = useSelector(state => state.auth.user)
   let postcat = post.filter(a => a.categorie === showcat);
   const dataCategorie = Object.keys(cat).map(i => ({
@@ -531,25 +531,47 @@ useEffect(() => {
                           {item.content}
                         </Text>
                       </View>
-                      <TouchableOpacity
-                        onPress={() =>
-                          navigation.push('SinglePost', {
-                            item: item,
-                          })
-                        }
-                        style={{
-                          flex: 1,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}>
-                        <Text
+                      <View style={{flexDirection: "row"}}>
+                        <TouchableOpacity
+                          onPress={() =>
+                            navigation.push('SinglePost', {
+                              item: item,
+                            })
+                          }
                           style={{
-                            color: 'tomato',
-                            textDecorationLine: 'underline',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                           }}>
-                          Voir Plus
-                        </Text>
-                      </TouchableOpacity>
+                          <View style={{
+                            flexDirection: "row",
+                          marginRight: 10
+                          }}><Text
+                            style={{
+                              color: 'tomato',
+                              textDecorationLine: 'underline',
+                            }}>
+                              Voir Plus
+                            </Text>
+                            <TouchableOpacity
+                              onPress={() =>
+                                AddFavorie({ uid, pid: item.id_post }, dispatchs)
+                              }
+                              style={{
+                                
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}>
+                              <Text
+                                style={{
+                                  color: 'blue',
+                                  marginLeft: 9
+                                }}>
+                                Add 
+                              </Text>
+                            </TouchableOpacity></View>
+                        </TouchableOpacity>
+                       
+                      </View>
                     </View>
                     <View
                       style={{
@@ -785,6 +807,12 @@ useEffect(() => {
 
   const userss = useSelector(state => state.auth.user)
   const l = userss.others?.name[0] + userss.others?.username[0]
+  const { loading, favorie, error } = useSelector(state => state.favorie)
+    console.log(error);
+const dispatchs = useDispatch()
+  const nitt = useSelector(state => state.auth.user)
+  const uid = nitt?.others?.id;
+  
 
   return (
     <View style={styles.container}>

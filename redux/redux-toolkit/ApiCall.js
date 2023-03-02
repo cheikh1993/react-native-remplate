@@ -3,10 +3,11 @@ import { addUserStart, adduserSucces, addUserFaillure, addUserFaillureMessage } 
 import {
     loginStart,
     loginSuccess,
-    loginFaillure
+    loginFaillure,
+    message
 } from "./Authenfication/loginSlice"
 
-import { starLoading, getFavorie, faillure } from "./favoriePostSlice";
+import { starLoading, getFavorie, faillure, addFavoriePost } from "./favoriePostSlice";
 const API_URL = 'https://node-sql-faye-api.vercel.app';
 
 
@@ -25,13 +26,15 @@ export const getUsers = async (dispatch) => {
 //=============AUTHENTIFICATION=============//
 
 //----------LOGIN----------------//
-export const login = async (user, dispatch) => {
+export const login = async  (user, dispatch) => {
     dispatch(loginStart())
     try {
         const res = await axios.post(`${API_URL}/api/user/login`, user)
-        dispatch(loginSuccess(res.data))
+            dispatch(loginSuccess(res.data))
+
     } catch (error) {
-        dispatch(loginFaillure())
+        dispatch(loginFaillure(error.response.data))
+        dispatch(message(error.response.data));
     }
 
 }
@@ -41,11 +44,22 @@ export const login = async (user, dispatch) => {
 //-----------------Get All favorie post---------------//
 
 export const getFavoriePost = async (userId, dispatch) => {
-    dispatch(starLoading)
+    dispatch(starLoading())
     try {
         const res = await axios.get(`${API_URL}/api/favorie?userId=` + userId)
 
         dispatch(getFavorie(res.data))
+    } catch (error) {
+        dispatch(faillure(error.response.data))
+    }
+}
+
+//----------------Add a favorite post----------------//
+export const AddFavorie = async (favorie, dispatch) => {
+    dispatch(starLoading())
+    try {
+        const res = await axios.post(`${API_URL}/api/favorie/add`,favorie)
+            dispatch(addFavoriePost(res.data))
     } catch (error) {
         dispatch(faillure(error.response.data))
     }

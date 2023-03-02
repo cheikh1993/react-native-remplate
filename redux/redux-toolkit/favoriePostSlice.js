@@ -7,6 +7,7 @@ export const favorieSlice = createSlice({
     initialState: {
         loading: false,
         favorie: {},
+        favoriePost: {},
         error: false
     },
     reducers: {
@@ -18,14 +19,21 @@ export const favorieSlice = createSlice({
 
         },
         faillure: (state, action) => {
-             state.error = action.payload,
-              state.loading = false 
-            
-            },
+            state.error = action.payload,
+                state.loading = false
+
+        },
+
+        // Add favorie reducer //
+
+        addFavoriePost: (state, action) => {
+            state.loading = false,
+                state.favoriePost = action.payload
+        }
     }
 
 
 })
 
-export const { starLoading, getFavorie, faillure } = favorieSlice.actions
+export const { starLoading, getFavorie, faillure, addFavoriePost } = favorieSlice.actions
 export default favorieSlice.reducer
