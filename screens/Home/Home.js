@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 
 import {
   View,
@@ -15,7 +15,7 @@ import {
   TouchableWithoutFeedback,
   Animated,
 } from 'react-native';
-import { InputForm, Loading, Tabs, TextButtom, UpdateModif } from '../../components';
+import { InputForm, Loading, PostItem, Tabs, TextButtom, UpdateModif } from '../../components';
 import Header from '../../components/Header';
 import { icons, images } from '../../constants';
 import { AuthContext } from '../../context/AuthContext';
@@ -24,7 +24,7 @@ import axios from 'axios';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Favorie, Notification, Search } from '../jndex';
 import { useDispatch, useSelector } from 'react-redux';
-import { AddFavorie, getUsers } from '../../redux/redux-toolkit/ApiCall';
+import { AddFavorie, getCategoriePost, getFavoriePost, getPosts, getUsers } from '../../redux/redux-toolkit/ApiCall';
 const { height, width } = Dimensions.get('screen');
 const ITEM_SIZE = width * 0.3;
 
@@ -34,7 +34,7 @@ const API_URL = 'https://node-sql-faye-api.vercel.app';
 const Home = ({ navigation }) => {
   const { user } = useContext(AuthContext);
   const [menu, setMenu] = React.useState(1);
-  const [showcat, setShowcat] = React.useState('');
+  const [showcat, setShowcat] = React.useState("postCategorie");
   const [cat, setCat] = React.useState({});
   const [post, setPost] = React.useState([]);
   const [showLoading, setShowLoading] = React.useState(false);
@@ -44,63 +44,28 @@ const Home = ({ navigation }) => {
   const [categorie, setCategorie] = React.useState('');
   const [showMenubar, setShowMenubar] = React.useState(true)
   const scrollx = useRef(new Animated.Value(0)).current;
-  const { userInfo, padding, errorMessage } = useSelector(state => state.user)
-const userId = useSelector(state => state.auth.user)
-  let postcat = post.filter(a => a.categorie === showcat);
-  const dataCategorie = Object.keys(cat).map(i => ({
+  const [categoriePost, setCategoriePost] = useState([])
+  const { error, posts, errorMessage, postCategorie } = useSelector(state => state.post)
+  // let postcat = posts.filter(a => a.categorie === postCategorie);
+
+
+
+  const dataCategorie = Object.keys(postCategorie).map(i => ({
     id: i,
-    cat: cat[i],
+    cat: postCategorie[i],
   }));
-  const getCategorie = async () => {
-    try {
-      const res = await axios.get(`${API_URL}/api/post/cat`);
-      setCat(res.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-const dispatch = useDispatch()
+  const dispatch = useDispatch()
+  const dispatchc = useDispatch()
+  const dispatchp = useDispatch()
 
 
-useEffect(() => {
-  getCategorie();
-  getPost()
-  getUsers(dispatch)
+  useEffect(() => {
+    getCategoriePost(dispatch)
+    getPosts(dispatch)
+
+    getUsers(dispatch)
   }, []);
-  const getPost = async () => {
-    try {
-      const res = await axios.get(`${API_URL}/api/post`);
-      setPost(res.data);
-    } catch (err) {
-      console.log(err.response.data);
-    }
-  };
-  const handlLike = async id => {
 
-    const getLikesId = async () => {
-      try {
-        const likes = await axios.get(`${API_URL}/api/post/${id}`);
-
-        const likeUpdate = likes.data.map(l => l.likes);
-        console.log(likeUpdate[0]);
-
-        try {
-          const update = await axios.put(`${API_URL}/api/post/like/${id}`, {
-            likes: likeUpdate[0] + 1,
-          });
-          console.log(update.data);
-          getPost()
-        } catch (error) {
-          console.log(error.response.data);
-        }
-      } catch (error) {
-        console.log(error.response.data);
-      }
-    };
-    getLikesId();
-
-
-  };
   const renderModal = () => {
     return (
       <View
@@ -329,15 +294,69 @@ useEffect(() => {
       <View
         style={{
           flex: 1,
-          backgroundColor: '#6b6a6a',
+          backgroundColor: 'white',
         }}>
+        <Header
+          title={'Bienvenue'}
+          titleStyle={{
+            fontSize: 30,
+            color: '#000',
+            fontWeight: 'bold',
+            textTransform: 'uppercase',
+          }}
+          leftComponent={
+            <TouchableOpacity
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: 3,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderWidth: 0.5,
+                borderColor: 'grey',
+              }}>
+              <Image
+                source={icons.menu}
+                style={{
+                  width: 20,
+                  height: 20,
+                  tintColor: '#202020',
+                }}
+              />
+            </TouchableOpacity>
+          }
+          rightComponent={
+            <TouchableOpacity
+              style={{
+                width: 35,
+                height: 35,
+                borderRadius: 23,
+                elevation: 20,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: 'tomato',
+              }}>
+              <Text
+                style={{
+                  color: 'white',
+                  fontWeight: 'bold',
+                  fontSize: 20,
+                  letterSpacing: 1,
+                  fontFamily: 'serif',
+                }}>
+                {l && l.toLocaleUpperCase()}
+              </Text>
+            </TouchableOpacity>
+          }
+        />
         {showLoading && <Loading title={'Patientez svp...'} />}
-        {post.length == 0 && <Loading title={'TAKHIRLOUL TOUTI...'} />}
+        {posts.length == 0 && <Loading title={'TAKHIRLOUL TOUTI...'} />}
 
         <View
           style={{
             padding: 10,
             flexDirection: 'row',
+            width,
             alignItems: 'center',
             backgroundColor: '#323f4e',
           }}>
@@ -369,426 +388,52 @@ useEffect(() => {
               width: width,
               backgroundColor: '#323f4e',
             }}>
-            <FlatList
-              data={dataCategorie}
-              horizontal
-              snapToInterval={ITEM_SIZE}
-              decelerationRate={'fast'}
-              contentContainerStyle={{
-                paddingLeft: ITEM_SIZE,
-                paddingRight: ITEM_SIZE + 25,
+          
+             
+          <FlatList
+            data={dataCategorie}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={item => item.id}
+            renderItem={({ item }) => {
+              return (
+
+                <TouchableOpacity style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "teal",
+                  padding: 6,
+                  borderRadius: 5,
+                  marginRight: 3
+                  
+                }}><Text style={{
+                  color: "#fff",
+                  fontSize: 14,
+                  fontWeight: "400",
+                  textTransform: "capitalize"
+                }}>{item.cat.categorie}</Text></TouchableOpacity>
+                )
               }}
-              // onScroll={Animated.event(
-              //   [{ nativeEvent: { contentOffset: { x: scrollx } } }],
-              //   { useNativeDriver: true },
-              // )}
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={item => item.id}
-              renderItem={({ item, index }) => {
-                const inputRange = [
-                  (index - 1) * ITEM_SIZE,
-                  index * ITEM_SIZE,
-                  (index + 1) * ITEM_SIZE,
-                ];
-                const opacity = scrollx.interpolate({
-                  inputRange,
-                  outputRange: [0.4, 1, 0.4],
-                });
-                const scale = scrollx.interpolate({
-                  inputRange,
-                  outputRange: [0.7, 1.5, 0.7],
-                });
-                return (
-                  <TouchableOpacity
-                    onPress={() => {
-                      // setSelectedTab(item.id);
-                      setShowcat(item.cat.categorie);
-
-                      setShowLoading(true);
-                      // setShowcat(item.cat.categorie);
-                      setTimeout(() => {
-                        setShowLoading(false);
-                      }, 1000);
-                    }}
-                    style={{
-                      alignItems: 'center',
-                      // width: ITEM_SIZE  ,
-                      padding: 10,
-
-                                           justifyContent: 'center',
-                      // opacity: showcat == item.cat.categorie ? 1 : 0.55,
-                      borderBottomColor:
-                        showcat == item.cat.categorie ? '#fff' : null,
-                      borderBottomWidth:
-                        showcat == item.cat.categorie ? 2 : null,
-                      // backgroundColor: showcat == item.categorie ? 'red' : '#1f1f1f',
-                    }}>
-                    <Text
-                      style={{
-                        fontSize: 83 / dataCategorie.length,
-
-                        fontWeight: 'bold',
-                        fontFamily: 'sans-serif',
-                        color: '#ffffff',
-                        textTransform: 'uppercase',
-
-                        // opacity,
-                        // transform: [
-                        //   {
-                        //     scale,
-                        //   },
-                        // ],
-                      }}>
-                      {item.cat.categorie}
-                      {/* {item.categorie} */}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              }}
-            />
+              />
+              </View>
           </View>
+       <View
+       
+       style={{
+        marginTop: 12,
+        paddingHorizontal: 12
+       }}>
+        <FlatList 
+        ListFooterComponent={
+          <View style={{paddingBottom: 120}} />
+        }
+        data={posts}
+        keyExtractor={item => `${item.id_post}`}
+        renderItem={({item,index}) => <PostItem item={item} index={index} />}
+        />
+       </View>
         </View>
-        {showcat ? (
-          <FlatList
-            data={postcat}
-            keyExtractor={item => item.id_post}
-            renderItem={({ item, i }) => {
-              return (
-                <View
-                  style={{
-                    width,
-                    paddingBottom: 7,
-                  }}>
-                  <View
-                    style={{
-                      width: '100%',
-                      backgroundColor: 'white',
-                    }}>
-                    <TouchableOpacity
-                      style={{
-                        padding: 10,
-                        width: '50%',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                      }}>
-                      <Text
-                        style={{
-                          fontSize: 20,
-                          fontWeight: 'bold',
-                          color: 'tomato',
-                          textTransform: 'capitalize',
-                          marginRight: 10,
-                        }}>
-                        {item.name}
-                      </Text>
-                      <Image
-                        source={images.sport}
-                        style={{
-                          height: 30,
-                          width: 30,
-                          borderRadius: 20,
-                        }}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity>
-                      <Image
-                        source={{ uri: item.img }}
-                        style={{
-                          width: '100%',
-                          height: height * 0.3,
-                          resizeMode: 'cover',
-                        }}
-                      />
-                    </TouchableOpacity>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                      }}>
-                      <View
-                        style={{
-                          flex: 3,
-                          marginTop: 10,
-                          paddingLeft: 20,
-                        }}>
-                        <Text
-                          style={{
-                            width: '80%',
-                            fontSize: 25,
-                            fontWeight: 'bold',
-                          }}>
-                          {item.title}
-                        </Text>
-
-                        <Text
-                          numberOfLines={4}
-                          style={{
-                            fontSize: 15,
-                            color: 'grey',
-                            textAlign: 'justify',
-                          }}>
-                          {item.content}
-                        </Text>
-                      </View>
-                      <View style={{flexDirection: "row"}}>
-                        <TouchableOpacity
-                          onPress={() =>
-                            navigation.push('SinglePost', {
-                              item: item,
-                            })
-                          }
-                          style={{
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}>
-                          <View style={{
-                            flexDirection: "row",
-                          marginRight: 10
-                          }}><Text
-                            style={{
-                              color: 'tomato',
-                              textDecorationLine: 'underline',
-                            }}>
-                              Voir Plus
-                            </Text>
-                            <TouchableOpacity
-                              onPress={() =>
-                                AddFavorie({ uid, pid: item.id_post }, dispatchs)
-                              }
-                              style={{
-                                
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                              }}>
-                              <Text
-                                style={{
-                                  color: 'blue',
-                                  marginLeft: 9
-                                }}>
-                                Add 
-                              </Text>
-                            </TouchableOpacity></View>
-                        </TouchableOpacity>
-                       
-                      </View>
-                    </View>
-                    <View
-                      style={{
-                        flex: 1,
-                        marginTop: 10,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        marginHorizontal: 12,
-                        marginBottom: 6,
-                      }}>
-                      <TouchableOpacity
-                        onPress={() => handlLike(item.id_post)}
-                        style={{
-                          flex: 1,
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          justifyContent: 'space-evenly',
-                          padding: 10,
-                          borderRadius: 10,
-                          backgroundColor: '#e2e0e072',
-                        }}>
-                        <Text> {
-                          item.likes > 1 ? "Likes" : "Like"
-                        } </Text>
-                        {
-                          item.likes > 1 && <Text>{item.likes}</Text>
-                        }
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={{
-                          flex: 1,
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          marginHorizontal: 10,
-                          justifyContent: 'space-evenly',
-                          padding: 10,
-                          borderRadius: 10,
-                          backgroundColor: '#e2e0e072',
-                        }}>
-                        <Text>Comment</Text>
-                        <Text>10</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={{
-                          flex: 1,
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          justifyContent: 'space-evenly',
-                          padding: 10,
-                          borderRadius: 10,
-                          backgroundColor: '#e2e0e072',
-                        }}>
-                        <Text
-                          style={{
-                            color: 'tomato',
-                            fontWeight: '400',
-                          }}>
-                          Share
-                        </Text>
-                        <Text>9</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
-              );
-            }}
-          />
-        ) : (
-          <FlatList
-            data={post}
-            keyExtractor={item => item.id_post}
-            renderItem={({ item, i }) => {
-              return (
-                <View
-                  style={{
-                    width,
-                    paddingBottom: 7,
-                  }}>
-                  <View
-                    style={{
-                      width: '100%',
-                      backgroundColor: 'white',
-                    }}>
-                    <View style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      paddingHorizontal: 12,
-                      alignItems: "center"
-                    }}>
-                      <TouchableOpacity
-                        style={{
-                          width: '70%',
-                          alignItems: 'center',
-                          flexDirection: 'row',
-                          margin: 10,
-                        }}>
-                        <Text
-                          style={{
-                            fontSize: 13,
-                            marginRight: 10,
-                          }}>
-                          {item.name}
-                        </Text>
-                        <Text
-                          style={{
-                            fontSize: 13,
-                          }}>
-                          {item.username}
-                        </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                      onPress={() => console.log("menusx")}
-                      style={{
-                        height: 23,
-                        width: 23,
-                        alignItems: "center",
-                        justifyContent: "center"
-                      }}>
-                       <Image  source={icons.menub}
-                       style={{
-                        height: 20,
-                        width: 20,
-                        tintColor: "grey"
-                       }}
-                       />
-                      </TouchableOpacity>
-                    </View>
-                    <TouchableOpacity>
-                      <Image
-                        source={ post.length % 2 ? images.beach : images.sport }
-                        style={{
-                          width: '100%',
-                          height: height * 0.3,
-                          resizeMode: 'cover',
-                        }}
-                      />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={{
-                        marginTop: 10,
-                        paddingHorizontal: 20,
-                      }}>
-                      <Text
-                        style={{
-                          width: '80%',
-                          fontSize: 25,
-                          fontWeight: 'bold',
-                        }}>
-                        {item.title}
-                      </Text>
-
-                      <Text
-                        numberOfLines={4}
-                        style={{
-                          fontSize: 15,
-                          color: 'grey',
-                          textAlign: 'justify',
-                        }}>
-                        {item.content}
-                      </Text>
-                    </TouchableOpacity>
-                    <View
-                      style={{
-                        flex: 1,
-                        marginTop: 10,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        marginHorizontal: 12,
-                        marginBottom: 6,
-                      }}>
-                      <TouchableOpacity
-                        style={{
-                          flex: 1,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          padding: 10,
-                          borderRadius: 30,
-                          backgroundColor: '#e2e0e072',
-                        }}>
-                        <Text>Likes</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={{
-                          flex: 1,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          padding: 10,
-
-                          borderRadius: 30,
-                          backgroundColor: '#e2e0e072',
-                          marginHorizontal: 5,
-                        }}>
-                        <Text>Comment</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={{
-                          flex: 1,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          padding: 10,
-
-                          borderRadius: 30,
-                          backgroundColor: '#e2e0e072',
-                        }}>
-                        <Text>Share</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
-              );
-            }}
-          />
-        )}
-      </View>
+        
     );
   };
   function renderMenu() {
@@ -807,73 +452,15 @@ useEffect(() => {
 
   const userss = useSelector(state => state.auth.user)
   const l = userss.others?.name[0] + userss.others?.username[0]
-  const { loading, favorie, error } = useSelector(state => state.favorie)
-    console.log(error);
-const dispatchs = useDispatch()
+  const dispatchs = useDispatch()
   const nitt = useSelector(state => state.auth.user)
   const uid = nitt?.others?.id;
-  
 
   return (
     <View style={styles.container}>
       {showModal && renderModal()}
       <StatusBar backgroundColor="white" barStyle={'dark-content'} />
-     {
-      showMenubar && <UpdateModif />
-     }
-      <Header
-        title={'Bienvenue'}
-        titleStyle={{
-          fontSize: 30,
-          color: '#000',
-          fontWeight: 'bold',
-          textTransform: 'uppercase',
-        }}
-        leftComponent={
-          <TouchableOpacity
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: 3,
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderWidth: 0.5,
-              borderColor: 'grey',
-            }}>
-            <Image
-              source={icons.menu}
-              style={{
-                width: 20,
-                height: 20,
-                tintColor: '#202020',
-              }}
-            />
-          </TouchableOpacity>
-        }
-        rightComponent={
-          <TouchableOpacity
-            style={{
-              width: 35,
-              height: 35,
-              borderRadius: 23,
-              elevation: 20,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: 'tomato',
-            }}>
-            <Text
-              style={{
-                color: 'white',
-                fontWeight: 'bold',
-                fontSize: 20,
-                letterSpacing: 1,
-                fontFamily: 'serif',
-              }}>
-              { l &&  l.toLocaleUpperCase()}
-            </Text>
-          </TouchableOpacity>
-        }
-      />
+
       <View
         style={{
           flex: 1,
@@ -884,17 +471,14 @@ const dispatchs = useDispatch()
 
       <View
         style={{
-          // margin: 10,
-          // position: 'absolute',
-          // bottom: 2,
-          // left: 5,
-          // right: 5,
+  
           borderTopRightRadius: 10,
           height: 60,
           flexDirection: 'row',
           borderTopLeftRadius: 10,
           backgroundColor: '#fff',
-          ...styles.shadow1,
+          ...styles.shadow,
+
         }}>
         <Tabs
           icon={icons.home}

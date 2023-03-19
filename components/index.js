@@ -6,5 +6,6 @@ import Loading from "./Loading";
 import Header from "./Header";
 import Tabs from "./Tabs";
 import UpdateModif from "./UpdateModif";
+import PostItem from "./PostItem";
 
-export { Tabs, Header, UpdateModif, IconButton, CheckBox, InputForm, TextButtom, Loading};
+export { Tabs, PostItem, Header, UpdateModif, IconButton, CheckBox, InputForm, TextButtom, Loading};

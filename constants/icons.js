@@ -6,15 +6,21 @@
  const twitter = require("../assets/icons/twitter.png");
  const facebook = require("../assets/icons/facebook.png");
  const google = require("../assets/icons/google.png");
+ const filter = require("../assets/icons/filter.png");
 const home = require('../assets/icons/home.png');
 const menu = require('../assets/icons/menui.png');
 const search = require('../assets/icons/search_icon.png');
 const menub = require("../assets/icons/menub.png")
+const favorie = require("../assets/icons/favorie.png")
+const share = require("../assets/icons/share.png")
 
 export default{
     menu,
+    favorie,
+    share,
     menub,
     search,
+    filter,
 love,
 home,
 back,

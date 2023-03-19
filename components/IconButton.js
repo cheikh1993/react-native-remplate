@@ -1,5 +1,5 @@
 import React from 'react';
-import {Image, TouchableOpacity,Text,View} from 'react-native';
+import { Image, TouchableOpacity, Text, View } from 'react-native';
 
 const IconButton = ({
   containerStyle,
@@ -10,10 +10,10 @@ const IconButton = ({
   onPress,
 }) => {
   return (
-    <View style={{
-        flex: 1
-    }}>
+    <>
       <TouchableOpacity
+        onPress={onPress
+        }
         style={{
           alignItems: 'center',
           justifyContent: 'center',
@@ -21,18 +21,19 @@ const IconButton = ({
           padding: 4,
           ...containerStyle,
         }}>
-            <Image 
-            source={icon}
-            style={{
-                ...iconStyle
-            }}
-            />
-        </TouchableOpacity>
-        <Text style={{
-            alignSelf: "center",
-            ...labelStyle
-        }}>{label}</Text>
-    </View>
+        <Image
+          source={icon}
+          style={{
+
+            ...iconStyle
+          }}
+        />
+      </TouchableOpacity>
+      <Text style={{
+        alignSelf: "center",
+        ...labelStyle
+      }}>{label}</Text>
+  </>
   );
 };
 
