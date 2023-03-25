@@ -15,7 +15,6 @@ const RenderSingIn = ({ navigation }) => {
     const [visible, setIsvible] = useState(false)
     const dispatchs = useDispatch()
     const { error, message, user, loading } = useSelector(state => state.auth)
-    console.log(error, loading, message);
     if (user.others) {
         navigation.replace("Home")
     }

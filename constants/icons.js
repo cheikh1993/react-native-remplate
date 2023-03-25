@@ -13,9 +13,15 @@ const search = require('../assets/icons/search_icon.png');
 const menub = require("../assets/icons/menub.png")
 const favorie = require("../assets/icons/favorie.png")
 const share = require("../assets/icons/share.png")
+const detail = require("../assets/icons/detail.png")
+const deleted = require("../assets/icons/delete.png")
+const update = require("../assets/icons/update.png")
 
 export default{
     menu,
+    detail,
+    deleted,
+    update,
     favorie,
     share,
     menub,

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   View,
@@ -25,6 +25,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { Favorie, Notification, Search } from '../jndex';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddFavorie, getCategoriePost, getFavoriePost, getPosts, getUsers } from '../../redux/redux-toolkit/ApiCall';
+import { MotiView } from 'moti';
 const { height, width } = Dimensions.get('screen');
 const ITEM_SIZE = width * 0.3;
 
@@ -32,23 +33,19 @@ const API_URL = 'https://node-sql-faye-api.vercel.app';
 // const API_URL = "http://10.0.2.2:3000/"
 
 const Home = ({ navigation }) => {
-  const { user } = useContext(AuthContext);
   const [menu, setMenu] = React.useState(1);
   const [showcat, setShowcat] = React.useState("postCategorie");
-  const [cat, setCat] = React.useState({});
-  const [post, setPost] = React.useState([]);
+
   const [showLoading, setShowLoading] = React.useState(false);
   const [showModal, setShowModal] = React.useState(false);
   const [title, setTitle] = React.useState('');
   const [content, setContent] = React.useState('');
   const [categorie, setCategorie] = React.useState('');
-  const [showMenubar, setShowMenubar] = React.useState(true)
+  const [showMenubar, setShowMenubar] = React.useState(null)
   const scrollx = useRef(new Animated.Value(0)).current;
   const [categoriePost, setCategoriePost] = useState([])
   const { error, posts, errorMessage, postCategorie } = useSelector(state => state.post)
-  // let postcat = posts.filter(a => a.categorie === postCategorie);
-
-
+  // let postcat = posts.filter(a => a.categorie === postCategorie;
 
   const dataCategorie = Object.keys(postCategorie).map(i => ({
     id: i,
@@ -289,6 +286,9 @@ const Home = ({ navigation }) => {
     );
   };
 
+  const _renderItem = (({ item, index }) => <PostItem item={item} index={index}
+    showMenubar={showMenubar}
+    setShowMenu={setShowMenubar} />)
   const renderHome = () => {
     return (
       <View
@@ -354,86 +354,62 @@ const Home = ({ navigation }) => {
 
         <View
           style={{
-            padding: 10,
+            padding: 5,
+            marginHorizontal: 10,
+            borderRadius: 10,
             flexDirection: 'row',
-            width,
             alignItems: 'center',
             backgroundColor: '#323f4e',
           }}>
-          <TouchableOpacity
-            style={{
-              marginRight: 10,
-              borderWidth: showcat === '' ? 1 : null,
-              borderRadius: 5,
-              borderColor: showcat === '' ? '#ffffff' : null,
-              padding: 5,
-            }}
-            onPress={() => {
-              setShowLoading(true);
-              setShowcat('');
-              setTimeout(() => {
-                setShowLoading(false);
-              }, 1000);
-            }}>
-            <Text
-              style={{
-                color: '#ffffff',
-                textTransform: 'uppercase',
-              }}>
-              Tous
-            </Text>
-          </TouchableOpacity>
-          <View
-            style={{
-              width: width,
-              backgroundColor: '#323f4e',
-            }}>
-          
-             
           <FlatList
             data={dataCategorie}
             horizontal
+            snapToInterval={1}
             showsHorizontalScrollIndicator={false}
             keyExtractor={item => item.id}
             renderItem={({ item }) => {
               return (
-
                 <TouchableOpacity style={{
                   alignItems: "center",
                   justifyContent: "center",
-                  backgroundColor: "teal",
                   padding: 6,
                   borderRadius: 5,
                   marginRight: 3
-                  
-                }}><Text style={{
-                  color: "#fff",
-                  fontSize: 14,
-                  fontWeight: "400",
-                  textTransform: "capitalize"
-                }}>{item.cat.categorie}</Text></TouchableOpacity>
-                )
-              }}
-              />
-              </View>
-          </View>
-       <View
-       
-       style={{
-        marginTop: 12,
-        paddingHorizontal: 12
-       }}>
-        <FlatList 
-        ListFooterComponent={
-          <View style={{paddingBottom: 120}} />
-        }
-        data={posts}
-        keyExtractor={item => `${item.id_post}`}
-        renderItem={({item,index}) => <PostItem item={item} index={index} />}
-        />
-       </View>
+
+                }}>
+                  <Text style={{
+                    color: "#fff",
+                    fontSize: 12,
+                    fontWeight: "400",
+                    textTransform: "capitalize"
+                  }}>{item.cat.categorie}</Text>
+                </TouchableOpacity>
+              )
+            }}
+          />
+
         </View>
-        
+        <View
+
+          style={{
+            paddingHorizontal: 10,
+            marginTop: 10,
+          }}>
+          <FlatList
+            ListFooterComponent={
+              <View style={{ paddingBottom: 120 }} />
+            }
+            data={posts}
+            initialNumToRender={5}
+
+            keyExtractor={item => `${item.id_post}`}
+            renderItem={_renderItem}
+
+
+          />
+        </View>
+      </View>
+
     );
   };
   function renderMenu() {
@@ -467,11 +443,12 @@ const Home = ({ navigation }) => {
           backgroundColor: '#f3f3f3',
         }}>
         {renderMenu()}
+
       </View>
 
       <View
         style={{
-  
+
           borderTopRightRadius: 10,
           height: 60,
           flexDirection: 'row',

@@ -1,11 +1,77 @@
-import React, { useEffect } from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity, Dimensions, ScrollView, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, Image, FlatList, TouchableOpacity, Dimensions, ScrollView, StyleSheet, Animated } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { IconButton, Loading, PostItem } from '../../components';
 import { icons, images } from '../../constants';
 import { getFavoriePost, AddFavorie } from '../../redux/redux-toolkit/ApiCall';
 const { width, height } = Dimensions.get("screen")
 const API_URL = 'https://node-sql-faye-api.vercel.app';
+
+const RenderHeaderFavorie = () => {
+    const scrollx = useRef(new Animated.Value(0)).current
+
+    return (
+        <Animated.View style={{
+            flex: 1,
+            height: height * 0.34,
+
+            backgroundColor: scrollx.interpolate({
+                inputRange: [height - 100, height - 50],
+                outputRange: [50, 0],
+                extrapolate: "clamp"
+            })
+
+        }}>
+            <View style={{
+                flex: 3,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "white"
+            }}><Text style={{
+                fontSize: 35,
+                fontWeight: "500",
+                textTransform: "uppercase",
+                color: "grey"
+            }}>Favories</Text>
+            </View>
+            <View style={{
+                flex: 1,
+                flexDirection: "row",
+                backgroundColor: "white",
+                paddingRight: 10,
+                justifyContent: "flex-end"
+            }}>
+                <IconButton
+                    icon={icons.filter}
+                    iconStyle={{
+                        height: 18,
+                        width: 18,
+                        tintColor: "grey"
+                    }}
+                />
+                <IconButton
+                    icon={icons.search}
+                    iconStyle={{
+                        height: 18,
+                        width: 18,
+                        tintColor: "grey",
+                        marginHorizontal: 10
+                    }}
+                />
+                <IconButton
+                    icon={icons.menub}
+                    iconStyle={{
+                        height: 18,
+                        width: 18,
+                        tintColor: "grey"
+
+                    }}
+                />
+            </View>
+        </Animated.View>
+    )
+}
+
 const Favorie = () => {
     const user = useSelector(state => state.auth.user);
     const { loading, favorie, error } = useSelector(state => state.favorie);
@@ -16,61 +82,7 @@ const Favorie = () => {
         getFavoriePost(uid, dispatch);
     }, [uid]);
 
-    const RenderHeaderFavorie = () => {
-        return (
-            <View style={{
-                flex: 1,
-                height: height * .34,
 
-            }}>
-                <View style={{
-                    flex: 3,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: "white"
-                }}><Text style={{
-                    fontSize: 35,
-                    fontWeight: "500",
-                    textTransform: "uppercase",
-                    color: "grey"
-                }}>Favories</Text></View>
-                <View style={{
-                    flex: 1,
-                    flexDirection: "row",
-                    backgroundColor: "white",
-                    paddingRight: 10,
-                    justifyContent: "flex-end"
-                }}>
-                    <IconButton
-                        icon={icons.filter}
-                        iconStyle={{
-                            height: 18,
-                            width: 18,
-                            tintColor: "grey"
-                        }}
-                    />
-                    <IconButton
-                        icon={icons.search}
-                        iconStyle={{
-                            height: 18,
-                            width: 18,
-                            tintColor: "grey",
-                            marginHorizontal: 10
-                        }}
-                    />
-                    <IconButton
-                        icon={icons.menub}
-                        iconStyle={{
-                            height: 18,
-                            width: 18,
-                            tintColor: "grey"
-
-                        }}
-                    />
-                </View>
-            </View>
-        )
-    }
 
     return (
         <View
@@ -95,9 +107,8 @@ const Favorie = () => {
                 <View style={{
                 }}>
                     <FlatList
-                        ListHeaderComponent={
-                                <View><RenderHeaderFavorie /></View>
-                        }
+                        ListHeaderComponent={RenderHeaderFavorie}
+
                         showsVerticalScrollIndicator={false}
                         data={favorie}
                         keyExtractor={item => `${item.id_post}`}
